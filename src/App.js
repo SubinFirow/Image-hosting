@@ -1,24 +1,17 @@
-import logo from './logo.svg';
+import { Card, CardContent } from "@mui/material";
+import { BrowserRouter as Router } from 'react-router-dom';
 import './App.css';
+import RoutesOne from "./pages/routes/routes";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Card sx={{ minWidth: 275 }}>
+      <CardContent>
+        <Router>
+          <RoutesOne />
+        </Router>
+      </CardContent>
+    </Card>
   );
 }
 
