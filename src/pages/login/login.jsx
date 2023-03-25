@@ -2,8 +2,23 @@ import { Button, Grid, TextField, Typography } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { auth, signInWithEmailAndPassword, signInWithGoogle } from "..//../firebase/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useEffect } from "react";
 
 function Login() {
+  const navigate = useNavigate();
+  const [user, loading, error] = useAuthState(auth);
+
+  useEffect(() => {
+    if (loading) {
+      // maybe trigger a loading screen
+      return;
+    }
+    if (user) navigate("/upload");
+  }, [user, loading, navigate, error]);
+
   const validationSchema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
     password: yup
@@ -30,7 +45,7 @@ function Login() {
             password: "",
           }}
           onSubmit={(values) => {
-            console.log(values);
+            signInWithEmailAndPassword(values.email, values.password)
           }}
           validationSchema={validationSchema}
         >

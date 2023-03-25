@@ -2,8 +2,16 @@ import React, { useRef } from 'react';
 import axios from 'axios';
 import useFileUpload from 'react-use-file-upload';
 import { Box, Button, Container, Typography } from '@mui/material';
+import { useNavigate } from "react-router-dom";
+import { auth, logout } from "..//../firebase/firebase";
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+
 
 const Upload = () => {
+  const navigate = useNavigate();
+  const [user, loading, error] = useAuthState(auth);
+
   const {
     files,
     fileNames,
@@ -23,7 +31,6 @@ const Upload = () => {
     e.preventDefault();
 
     const formData = createFormData();
-
     try {
       axios.post('https://some-api.com', formData, {
         'content-type': 'multipart/form-data',
@@ -31,7 +38,18 @@ const Upload = () => {
     } catch (error) {
       console.error('Failed to submit files.');
     }
+
+    navigate('/gallery')
   };
+
+  const userLogout = async () => {
+    try {
+        await logout();
+        navigate('/');
+      } catch (error) {
+        console.error(error);
+      }
+  }
 
   return (
     <Container maxWidth="sm">
@@ -92,6 +110,7 @@ const Upload = () => {
         </Box>
         <Button variant="contained" onClick={handleSubmit} sx={{ mt: 4 }}>Submit</Button>
       </Box>
+      <Button variant="contained" onClick={()=> userLogout()} sx={{ mt: 4 }}>Logout</Button>
     </Container>
   );
 };
