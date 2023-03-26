@@ -1,16 +1,15 @@
-import React, { useRef } from 'react';
-import axios from 'axios';
-import useFileUpload from 'react-use-file-upload';
-import { Box, Button, Container, Typography } from '@mui/material';
+import React, { useRef, useState } from "react";
+import useFileUpload from "react-use-file-upload";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { auth, logout } from "..//../firebase/firebase";
-import { useAuthState } from 'react-firebase-hooks/auth';
-
-
+import { useAuthState } from "react-firebase-hooks/auth";
+import Gallery from "../gallery/gallery";
 
 const Upload = () => {
   const navigate = useNavigate();
   const [user, loading, error] = useAuthState(auth);
+  const [result, setResult] = useState("");
 
   const {
     files,
@@ -26,36 +25,49 @@ const Upload = () => {
   } = useFileUpload();
 
   const inputRef = useRef();
-
+  const handleUploadResponse = () => <Gallery />;
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = createFormData();
-    try {
-      axios.post('https://some-api.com', formData, {
-        'content-type': 'multipart/form-data',
-      });
-    } catch (error) {
-      console.error('Failed to submit files.');
-    }
-
-    navigate('/gallery')
+    formData.append("file", files[0]);
+    formData.append("upload_preset", "rohrpnch");
+    formData.append("api_key", "636477119246411");
+    const options = {
+      method: "POST",
+      body: formData,
+    };
+    return fetch(
+      "https://api.Cloudinary.com/v1_1/:dix2mlb9q/image/upload",
+      options
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        setResult(...result, res.secure_url);
+        handleUploadResponse();
+        // navigate("/gallery", { data: result });
+      })
+      .catch((err) => console.log(err));
   };
 
   const userLogout = async () => {
     try {
-        await logout();
-        navigate('/');
-      } catch (error) {
-        console.error(error);
-      }
-  }
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Container maxWidth="sm">
-      <Box mt={4} p={2} sx={{ textAlign: 'center' }}>
-        <Typography variant="h3" mb={2}>Upload Files</Typography>
-        <Typography variant="body1" mb={2}>Please use the form below to upload any file(s) of your choosing.</Typography>
+      <Box mt={4} p={2} sx={{ textAlign: "center" }}>
+        <Typography variant="h3" mb={2}>
+          Upload Files
+        </Typography>
+        <Typography variant="body1" mb={2}>
+          Please use the form below to upload any file(s) of your choosing.
+        </Typography>
         <Box
           display="flex"
           flexDirection="column"
@@ -64,32 +76,44 @@ const Upload = () => {
           border="1px solid grey"
           p={2}
           mb={4}
-          sx={{ minHeight: '200px', borderRadius: '4px' }}
+          sx={{ minHeight: "200px", borderRadius: "4px" }}
           onDragEnter={handleDragDropEvent}
           onDragOver={handleDragDropEvent}
           onDrop={(e) => {
             handleDragDropEvent(e);
-            setFiles(e, 'a');
+            setFiles(e, "a");
           }}
         >
-          <Typography variant="body1" mb={2}>Drag and drop files here</Typography>
-          <Button variant="outlined" onClick={() => inputRef.current.click()}>Or select files to upload</Button>
+          <Typography variant="body1" mb={2}>
+            Drag and drop files here
+          </Typography>
+          <Button variant="outlined" onClick={() => inputRef.current.click()}>
+            Or select files to upload
+          </Button>
           <input
             ref={inputRef}
             type="file"
             multiple
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             onChange={(e) => {
-              setFiles(e, 'a');
+              setFiles(e, "a");
               inputRef.current.value = null;
             }}
           />
         </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           <ul>
             {fileNames.map((name) => (
               <li key={name}>
-                <Typography variant="body1" component="span">{name}</Typography>
+                <Typography variant="body1" component="span">
+                  {name}
+                </Typography>
                 <Button variant="text" onClick={() => removeFile(name)}>
                   <i className="fa fa-times" />
                 </Button>
@@ -99,18 +123,24 @@ const Upload = () => {
 
           {files.length > 0 && (
             <ul>
-              <li>File types found: {fileTypes.join(', ')}</li>
+              <li>File types found: {fileTypes.join(", ")}</li>
               <li>Total Size: {totalSize}</li>
               <li>Total Bytes: {totalSizeInBytes}</li>
               <li className="clear-all">
-                <Button variant="outlined" onClick={() => clearAllFiles()}>Clear All</Button>
+                <Button variant="outlined" onClick={() => clearAllFiles()}>
+                  Clear All
+                </Button>
               </li>
             </ul>
           )}
         </Box>
-        <Button variant="contained" onClick={handleSubmit} sx={{ mt: 4 }}>Submit</Button>
+        <Button variant="contained" onClick={handleSubmit} sx={{ mt: 4 }}>
+          Submit
+        </Button>
       </Box>
-      <Button variant="contained" onClick={()=> userLogout()} sx={{ mt: 4 }}>Logout</Button>
+      <Button variant="contained" onClick={() => userLogout()} sx={{ mt: 4 }}>
+        Logout
+      </Button>
     </Container>
   );
 };

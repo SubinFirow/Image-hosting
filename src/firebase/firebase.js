@@ -62,6 +62,7 @@ const signInWithGoogle = async () => {
 };
 
 const logInWithEmailAndPassword = async (email, password) => {
+  console.log("thunder")
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {

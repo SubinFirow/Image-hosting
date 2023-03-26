@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { auth, signInWithEmailAndPassword, signInWithGoogle } from "..//../firebase/firebase";
+import { auth, logInWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "..//../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect } from "react";
 
@@ -45,7 +45,8 @@ function Login() {
             password: "",
           }}
           onSubmit={(values) => {
-            signInWithEmailAndPassword(values.email, values.password)
+            console.log("kokoko",values)
+            logInWithEmailAndPassword(values.email, values.password)
           }}
           validationSchema={validationSchema}
         >
