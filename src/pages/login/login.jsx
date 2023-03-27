@@ -45,7 +45,6 @@ function Login() {
             password: "",
           }}
           onSubmit={(values) => {
-            console.log("kokoko",values)
             logInWithEmailAndPassword(values.email, values.password)
           }}
           validationSchema={validationSchema}

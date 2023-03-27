@@ -4,12 +4,15 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { auth, logout } from "..//../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import Gallery from "../gallery/gallery";
+import {useDispatch, useSelector} from 'react-redux';
+import { imageUpload } from "../../redux/slices/img-slices";
 
 const Upload = () => {
   const navigate = useNavigate();
   const [user, loading, error] = useAuthState(auth);
-  const [result, setResult] = useState("");
+  const storeImage = useSelector(state => state.image) 
+
+  const dispatch=useDispatch()
 
   const {
     files,
@@ -25,7 +28,10 @@ const Upload = () => {
   } = useFileUpload();
 
   const inputRef = useRef();
-  const handleUploadResponse = () => <Gallery />;
+  const handleUploadResponse = (url) => {
+    dispatch(imageUpload(url))
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -43,9 +49,9 @@ const Upload = () => {
     )
       .then((res) => res.json())
       .then((res) => {
-        setResult(...result, res.secure_url);
-        handleUploadResponse();
-        // navigate("/gallery", { data: result });
+        // setResult(prevState => [...prevState , res.secure_url]);
+        alert("image added")
+        handleUploadResponse(res.secure_url);
       })
       .catch((err) => console.log(err));
   };
@@ -63,7 +69,7 @@ const Upload = () => {
     <Container maxWidth="sm">
       <Box mt={4} p={2} sx={{ textAlign: "center" }}>
         <Typography variant="h3" mb={2}>
-          Upload Files
+        Upload Files 
         </Typography>
         <Typography variant="body1" mb={2}>
           Please use the form below to upload any file(s) of your choosing.
@@ -134,8 +140,14 @@ const Upload = () => {
             </ul>
           )}
         </Box>
+        <Typography variant="h6" mb={2}>
+        click submit to add images
+        </Typography>
         <Button variant="contained" onClick={handleSubmit} sx={{ mt: 4 }}>
           Submit
+        </Button>
+        <Button variant="contained" onClick={() => navigate('/gallery')} sx={{ mt: 4, ml:4 }} disabled={!storeImage.image.length}>
+          Go to Gallery
         </Button>
       </Box>
       <Button variant="contained" onClick={() => userLogout()} sx={{ mt: 4 }}>
